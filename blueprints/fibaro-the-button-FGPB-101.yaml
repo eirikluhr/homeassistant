@@ -1,0 +1,121 @@
+# ZWave-JS - Fibaro The Button (FGPB-101) - All Scenes
+blueprint: 
+  description: "Create automations for The Button by Fibaro using the Z-Wave JS integration.\n"
+  domain: automation
+  input: 
+    fibaro_thebutton: 
+      description: "List of available The Button devices."
+      name: "Fibaro The Button"
+      selector: 
+        device: 
+          integration: zwave_js
+          manufacturer: Fibargroup
+          model: FGPB-101
+    key_held_down: 
+      default: []
+      description: "Action to run when button is held down."
+      name: "Held Down"
+      selector: 
+        action: {}
+    key_pressed_1x: 
+      default: []
+      description: "Action to run when button is pressed once."
+      name: "Pressed Once"
+      selector: 
+        action: {}
+    key_pressed_2x: 
+      default: []
+      description: "Action to run when button is pressed twice."
+      name: "Pressed Twice"
+      selector: 
+        action: {}
+    key_pressed_3x: 
+      default: []
+      description: "Action to run when button is pressed three times."
+      name: "Pressed Three Times"
+      selector: 
+        action: {}
+    key_pressed_4x: 
+      default: []
+      description: "Action to run when button is pressed four times."
+      name: "Pressed Four Times"
+      selector: 
+        action: {}
+    key_pressed_5x: 
+      default: []
+      description: "Action to run when button is pressed five times."
+      name: "Pressed Five Times"
+      selector: 
+        action: {}
+    key_released: 
+      default: []
+      description: "Action to run when button is released after being held down."
+      name: Released
+      selector: 
+        action: {}
+  name: "ZWave-JS - Fibaro The Button (FGPB-101) v2021.12.08"
+  source_url: "https://community.home-assistant.io/t/zwave-js-fibaro-the-button-fgpb-101-v2021-12-08/300945"
+condition: "{{ trigger.event.data.device_id == device_id }}"
+max_exceeded: silent
+mode: single
+trigger: 
+  - event_type: zwave_js_value_notification
+    platform: event
+variables: 
+  device_id: !input 'fibaro_thebutton'
+
+action: 
+  - variables: 
+      command_class_name: "{{ trigger.event.data.command_class_name }}"
+      label: "{{ trigger.event.data.label }}"
+      node_id: "{{ trigger.event.data.node_id }}"
+      property_key_name: "{{ trigger.event.data.property_key_name }}"
+      property_name: "{{ trigger.event.data.property_name }}"
+      value: "{{ trigger.event.data.value }}"
+  - data: 
+      message: "received event from node {{node_id}}: {{ command_class_name }} - {{ value }} - {{ label }}"
+      name: "Z-Wave JS"
+    service: logbook.log
+  - choose: 
+      - conditions: |
+            {{  property_name == 'scene' 
+                and property_key_name == '001'
+                and (value == 'KeyPressed' or value == 0)
+            }}
+        sequence: !input 'key_pressed_1x'
+      - conditions: |
+            {{  property_name == 'scene' 
+                and property_key_name == '001'
+                and (value == 'KeyPressed2x' or value == 3)
+            }}
+        sequence:  !input 'key_pressed_2x'
+      - conditions: |
+            {{  property_name == 'scene' 
+                and property_key_name == '001'
+                and (value == 'KeyPressed3x' or value ==4) 
+            }}
+        sequence:  !input 'key_pressed_3x'
+      - conditions: |
+            {{  property_name == 'scene' 
+                and property_key_name == '001'
+                and (value == 'KeyPressed4x' or value == 5) 
+            }}
+        sequence:  !input 'key_pressed_4x'
+      - conditions: |
+            {{  property_name == 'scene' 
+                and property_key_name == '001'
+                and (value == 'KeyPressed5x' or value == 6) 
+            }}
+        sequence:  !input 'key_pressed_5x'
+      - conditions: |
+            {{  property_name == 'scene' 
+                and property_key_name == '001'
+                and (value == 'KeyHeldDown' or value == 2) 
+            }}
+        sequence:  !input 'key_held_down'
+      - conditions: |
+            {{  property_name == 'scene' 
+                and property_key_name == '001'
+                and (value == 'KeyReleased' or value == 1) 
+            }}
+        sequence:  !input 'key_released'
