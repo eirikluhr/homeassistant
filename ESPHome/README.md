@@ -1,6 +1,5 @@
 # ESPHome projects
 
-## Garage door controller
+## [Garage door controller](./garage-door/)
 
-## Hydrophonics tower controller
-
+## [Hydrophonics tower controller](./hydrohonics-tower/)
