@@ -1,0 +1,80 @@
+esphome:
+  name: water-pump-controller
+  friendly_name: Water Pump Controller
+
+esp32:
+  board: esp32-c6-devkitc-1
+  variant: esp32c6
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+# This fixes the warning and adds a recovery web interface
+captive_portal:
+
+# Standard OTA for wireless updates
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: "xyziot"
+  password: "SnartErDetJulIgjen2022"
+  
+  # Enable fallback hotspot
+  ap:
+    ssid: "Water-Pump-Hotspot"
+
+# Add this to your existing configuration
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO16
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Pump Manual Button"
+    on_press:
+      - switch.toggle: water_pump
+
+sensor:
+  - platform: wifi_signal
+    name: "Pump WiFi Signal"
+    update_interval: 60s
+
+output:
+  - platform: gpio
+    pin: GPIO17
+    id: pump_relay_pin
+
+  - platform: gpio
+    pin: GPIO19
+    id: status_led_pin
+
+light:
+  - platform: binary
+    id: pump_status_led
+    output: status_led_pin
+    internal: true 
+
+switch:
+  - platform: output
+    name: "Water Pump"
+    id: water_pump
+    output: pump_relay_pin
+    icon: "mdi:water-pump"
+    
+    # Logic for LED and Safety Timer
+    on_turn_on:
+      - light.turn_on: pump_status_led
+      - delay: 30min
+      - if:
+          condition:
+            switch.is_on: water_pump
+          then:
+            - switch.turn_off: water_pump
+            - logger.log: "Runaway Protection triggered: Pump shut off after 30 mins."
+            
+    on_turn_off:
+      - light.turn_off: pump_status_led
