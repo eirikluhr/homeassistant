@@ -50,6 +50,8 @@ output:
   - platform: gpio
     pin: GPIO17
     id: pump_relay_pin
+    # The relay is Active Low - but we use an 2N3904 transistor to connect the relay's IN to GND
+    inverted: false
 
   - platform: gpio
     pin: GPIO19
@@ -67,6 +69,8 @@ switch:
     id: water_pump
     output: pump_relay_pin
     icon: "mdi:water-pump"
+    # ALWAYS_OFF ensures the pump doesn't turn on automatically after a power flick
+    restore_mode: ALWAYS_OFF
     
     # Logic for LED and Safety Timer
     on_turn_on:
