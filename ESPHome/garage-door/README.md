@@ -18,3 +18,4 @@ Optoisolator Orientation: On the "input" side of the optoisolator, ensure the cu
 
 Reed Switch Mounting: Since garage doors can vibrate or shift in the wind, ensure your magnets are mounted firmly so that the "Closed" signal remains stable when the door is latched.
 
+![Wiring diagram](Gemini_Generated_Image_zeqa4izeqa4izeqa.png)
