@@ -2,14 +2,16 @@
 
 XIAO ESP32-C6 Wiring Diagram
 
-Component,ESPHome GPIO,XIAO Physical Label,Wiring Instruction
-Relay Signal,GPIO 17,D7,Connect D7 to the IN pin on your relay module.
-Status LED,GPIO 19,D8,Connect D8 → 330Ω Resistor → LED (+) → GND.
-Toggle Button,GPIO 16,D6,Connect D6 → Momentary Button → GND.
-Common Ground,GND,GND,Ensure all components share a connection to a XIAO GND pin.
-Power Input,5V / VIN,5V,Provide power via USB-C or the 5V pin.
+Breakdown of the Critical Driver Circuit (Highlighted in the Image):
+- XIAO D7 (GPIO17) Output: This pin provides the 3.3V "brain signal."
+- Transistor (2N3904): We have explicitly detailed the pinout (Emitter, Base, Collector with the flat side facing you). This component performs the "heavy lifting" by electrically linking the 5V Relay IN pin to GND whenever the XIAO sends a 3.3V signal.
+- The 1kΩ Base Resistor: This resistor is mandatory. It sits between XIAO D7 and the Base of the transistor, protecting your XIAO pin from drawing too much current.
+- The 10kΩ Pull-Up (on Relay IN): As discussed, this resistor goes from the Relay IN pin up to the 5V rail. This is the key safety measure—it forces the 5V relay's signal "high" (OFF) whenever the transistor is not being actively switched by the XIAO, ensuring the pump stays OFF during reboots.
 
-Pro-Tips for the XIAO Form Factor:
-- Level Shifting: The XIAO series is strictly 3.3V logic. If your relay module is designed for 5V "High Level" triggers, it might be "flaky" when triggered by the XIAO's 3.3V pins. If the pump doesn't click on, you may need a relay that specifically supports 3.3V signals.
-- Pull-up Resistors: In the YAML I provided, I used mode: INPUT_PULLUP for the button on GPIO 16. This uses the XIAO's internal resistor, so you do not need to add an external resistor to your button circuit.
-- Soldering vs. Breadboard: For a water pump project, I highly recommend soldering your connections or using the XIAO "Screw Terminal" expansion board. Breadboard jumpers can vibrate loose over time, especially if the pump causes any mechanical vibration nearby.
+Other Components (Included for completeness):
+- Manual Toggle Button: Connected simply between XIAO D6 (GPIO16) and GND. We use the XIAO's internal pull-up resistor (defined in the ESPHome YAML), so no extra external resistors are needed here.
+- Status LED: Connected from XIAO D8 (GPIO19) through a 330Ω resistor to GND.
+- With this circuit, your XIAO is now perfectly isolated from the 5V logic. Your ESPHome inverted: false logic will work as expected, and your pump controller will be robust and reliable.
+
+
+![Wiring diagram](Gemini_Generated_Image_5mpslo5mpslo5mps.png)
